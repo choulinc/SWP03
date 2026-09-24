@@ -2,9 +2,12 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#eff3f8" />
-    <meta name="description" content="辦點事，一個簡單好用的待辦清單。把想做的，變成做到了。資料保存在你的瀏覽器中。" />
+    <meta
+      name="description"
+      content="辦點事，把想做的，變成做到了。具備日期、優先順序、子任務與本機備份的待辦清單。"
+    />
     <title>辦點事 · 把想做的，變成做到了</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
@@ -13,66 +16,332 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <a class="brand" href="./" aria-label="辦點事首頁">
-          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span>辦點事<span class="brand-dot">.</span></span>
-        </a>
-        <span class="topbar-note">把想做的，變成做到了</span>
+        <a class="brand" href="./" aria-label="辦點事首頁"
+          ><span class="brand-mark" aria-hidden="true"
+            ><span></span><span></span><span></span></span
+          ><span>辦點事<span class="brand-dot">.</span></span></a
+        >
+        <div class="top-actions">
+          <button
+            type="button"
+            id="theme-toggle"
+            class="top-action"
+            aria-label="切換深色模式"
+            title="切換深色模式"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M20 15.4A8.2 8.2 0 0 1 8.6 4 8.2 8.2 0 1 0 20 15.4Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="export-button"
+            class="top-action text-action"
+          >
+            匯出備份
+          </button>
+          <button
+            type="button"
+            id="import-button"
+            class="top-action text-action"
+          >
+            匯入備份
+          </button>
+          <input
+            id="import-file"
+            type="file"
+            accept=".json,application/json"
+            hidden
+          />
+        </div>
       </header>
 
       <main class="workspace">
-        <aside class="intro-panel" aria-label="今日概覽">
+        <aside class="intro-panel" aria-label="清單概覽">
           <div class="intro-content">
-            <div class="date-line"><span class="date-indicator" aria-hidden="true"></span><span id="today-date"></span></div>
+            <div class="date-line">
+              <span class="date-indicator" aria-hidden="true"></span
+              ><span id="today-date"></span>
+            </div>
             <h1>把想做的事，<br /><span>一件件完成。</span></h1>
-            <p class="intro-description">寫下待辦，專注眼前。每完成一件，就離理想中的今天更近一點。</p>
+            <p class="intro-description">
+              寫下待辦，專注眼前。每完成一件，就離理想中的今天更近一點。
+            </p>
           </div>
           <div class="progress-block">
-            <div class="progress-heading"><span>今日進度</span><strong id="progress-percent">0%</strong></div>
-            <div class="progress-track" role="progressbar" aria-label="待辦完成進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar"><span id="progress-fill"></span></div>
+            <div class="progress-heading">
+              <span>清單進度</span><strong id="progress-percent">0%</strong>
+            </div>
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="待辦完成進度"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              id="progress-bar"
+            >
+              <span id="progress-fill"></span>
+            </div>
             <p id="progress-caption">新增第一件待辦，開始今天的安排。</p>
           </div>
-          <div class="panel-ornament" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="panel-ornament" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
         </aside>
 
         <section class="list-panel" aria-labelledby="list-title">
           <div class="list-heading">
             <div>
               <p class="section-label">你的清單</p>
-              <h2 id="list-title">待辦事項<span class="task-count" id="task-count">0</span></h2>
+              <h2 id="list-title">
+                待辦事項<span class="task-count" id="task-count">0</span>
+              </h2>
             </div>
-            <span class="storage-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 6.5v5c0 5 3.4 8.2 8 9.5 4.6-1.3 8-4.5 8-9.5v-5L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>自動儲存在此瀏覽器</span>
+            <span class="storage-note">✓ 自動儲存在此瀏覽器</span>
           </div>
 
           <form id="add-form" class="add-form" autocomplete="off">
             <label class="sr-only" for="new-task">新增待辦事項</label>
-            <span class="add-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-            <input id="new-task" name="task" type="text" maxlength="200" placeholder="新增一件想完成的事..." required />
-            <button type="submit">新增<span class="button-arrow" aria-hidden="true">↗</span></button>
+            <span class="add-icon" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 5v14M5 12h14"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                /></svg
+            ></span>
+            <input
+              id="new-task"
+              name="task"
+              type="text"
+              maxlength="200"
+              placeholder="新增一件想完成的事..."
+              required
+            />
+            <button type="submit">
+              新增 <span aria-hidden="true">↗</span>
+            </button>
           </form>
           <p class="form-error" id="form-error" role="alert" hidden></p>
 
           <div class="list-toolbar">
             <div class="filters" role="group" aria-label="篩選待辦事項">
-              <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">全部</button>
-              <button type="button" class="filter" data-filter="active" aria-pressed="false">待完成</button>
-              <button type="button" class="filter" data-filter="completed" aria-pressed="false">已完成</button>
+              <button
+                type="button"
+                class="filter is-active"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                全部
+              </button>
+              <button
+                type="button"
+                class="filter"
+                data-filter="active"
+                aria-pressed="false"
+              >
+                待完成
+              </button>
+              <button
+                type="button"
+                class="filter"
+                data-filter="completed"
+                aria-pressed="false"
+              >
+                已完成
+              </button>
+              <button
+                type="button"
+                class="filter"
+                data-filter="overdue"
+                aria-pressed="false"
+              >
+                已逾期
+              </button>
+              <button
+                type="button"
+                class="filter"
+                data-filter="archived"
+                aria-pressed="false"
+              >
+                封存
+              </button>
             </div>
             <span id="remaining-count" class="remaining-count">0 件待完成</span>
           </div>
 
+          <div class="tool-row">
+            <label class="search-wrap"
+              ><span class="sr-only">搜尋事項</span
+              ><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle
+                  cx="10.8"
+                  cy="10.8"
+                  r="6.3"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="m16 16 4.2 4.2"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                /></svg
+              ><input
+                id="search-input"
+                type="search"
+                placeholder="搜尋事項 / 備註"
+            /></label>
+            <select id="priority-filter" aria-label="依優先順序篩選">
+              <option value="all">所有優先順序</option>
+              <option value="high">高優先</option>
+              <option value="medium">中優先</option>
+              <option value="low">低優先</option>
+              <option value="none">未設定</option>
+            </select>
+            <select id="category-filter" aria-label="依分類篩選">
+              <option value="all">所有分類</option>
+            </select>
+            <select id="sort-select" aria-label="排序方式">
+              <option value="newest">最新建立</option>
+              <option value="oldest">最早建立</option>
+              <option value="due">截止日</option>
+              <option value="priority">優先順序</option>
+              <option value="name">名稱</option>
+            </select>
+          </div>
+          <div class="selection-row">
+            <button
+              id="select-mode"
+              type="button"
+              class="link-button"
+              aria-pressed="false"
+            >
+              選取多項
+            </button>
+            <div id="batch-actions" class="batch-actions" hidden>
+              <button type="button" id="select-all">全選目前結果</button
+              ><span id="selected-count">已選 0 件</span
+              ><button type="button" id="batch-complete">標記完成</button
+              ><button type="button" id="batch-delete" class="danger-text">
+                刪除
+              </button>
+            </div>
+          </div>
+
           <ul id="task-list" class="task-list" aria-label="待辦事項清單"></ul>
           <div id="empty-state" class="empty-state" hidden>
-            <div class="empty-art" aria-hidden="true"><span class="empty-paper"><span></span><span></span><span></span></span><span class="empty-check">✓</span></div>
+            <div class="empty-art" aria-hidden="true">
+              <span class="empty-paper"
+                ><span></span><span></span><span></span></span
+              ><span class="empty-check">✓</span>
+            </div>
             <h3 id="empty-title">從一件小事開始</h3>
             <p id="empty-description">在上方輸入待辦事項，讓今天有個好開始。</p>
           </div>
-
-          <div class="list-footer"><span>一步一步，就很了不起。</span><button id="clear-completed" type="button" hidden>清除已完成</button></div>
-          <p id="status-message" class="sr-only" role="status" aria-live="polite"></p>
+          <div class="list-footer">
+            <span>一步一步，就很了不起。</span
+            ><button id="clear-completed" type="button" hidden>
+              清除已完成
+            </button>
+          </div>
         </section>
       </main>
-      <footer class="site-footer"><span>辦點事</span><span>簡單記錄 · 安心保存</span></footer>
+      <footer class="site-footer">
+        <span>辦點事</span><span>簡單記錄 · 安心保存</span
+        ><span class="shortcut-hint">按 N 新增 · 按 / 搜尋</span>
+      </footer>
     </div>
+
+    <dialog id="task-dialog" class="task-dialog" aria-labelledby="dialog-title">
+      <form id="detail-form" class="detail-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="section-label">事項詳細</p>
+            <h2 id="dialog-title">編輯待辦</h2>
+          </div>
+          <button
+            type="button"
+            id="close-dialog"
+            class="icon-button"
+            aria-label="關閉"
+          >
+            ×
+          </button>
+        </div>
+        <label class="field"
+          >事項名稱<input id="detail-text" type="text" maxlength="200" required
+        /></label>
+        <div class="field-grid">
+          <label class="field"
+            >截止日<input id="detail-due" type="date" /></label
+          ><label class="field"
+            >優先順序<select id="detail-priority">
+              <option value="none">未設定</option>
+              <option value="high">高優先</option>
+              <option value="medium">中優先</option>
+              <option value="low">低優先</option>
+            </select></label
+          >
+        </div>
+        <div class="field-grid">
+          <label class="field"
+            >分類<input
+              id="detail-category"
+              type="text"
+              maxlength="40"
+              placeholder="例如：工作、生活" /></label
+          ><label class="field"
+            >重複<select id="detail-repeat">
+              <option value="none">不重複</option>
+              <option value="daily">每天</option>
+              <option value="weekly">每週</option>
+              <option value="monthly">每月</option>
+            </select></label
+          >
+        </div>
+        <label class="field"
+          >備註<textarea
+            id="detail-notes"
+            maxlength="2000"
+            rows="3"
+            placeholder="補充一些細節...可留空"
+          ></textarea>
+        </label>
+        <div class="subtask-section">
+          <div class="subtask-heading">
+            <strong>子任務</strong><span id="subtask-progress">0 / 0</span>
+          </div>
+          <ul id="subtask-list"></ul>
+          <div class="subtask-add">
+            <label class="sr-only" for="subtask-input">新增子任務</label
+            ><input
+              id="subtask-input"
+              type="text"
+              maxlength="120"
+              placeholder="新增一個小步驟"
+            /><button id="add-subtask" type="button">加入</button>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button id="cancel-dialog" type="button" class="secondary-button">
+            取消</button
+          ><button type="submit" class="primary-button">儲存變更</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+      <span id="toast-message"></span
+      ><button id="undo-button" type="button" hidden>復原</button
+      ><button id="dismiss-toast" type="button" aria-label="關閉提示">×</button>
+    </div>
+    <p id="status-message" class="sr-only" role="status" aria-live="polite"></p>
   </body>
 </html>
