@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>召喚師 · Teachable Machine 互動遊戲</title>
+<meta name="description" content="使用 Google Teachable Machine 訓練的圖片分類模型，透過攝影機即時辨識手勢或物品，觸發不同的畫面與音效變化。" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+</head>
+<body>
+
+<div id="stage" class="stage theme-0">
+
+  <header class="topbar">
+    <h1><span class="logo">🔮</span> 召喚師 <span class="sub">Teachable Machine 互動遊戲</span></h1>
+    <button id="setup-toggle" class="icon-btn" type="button" title="設定模型">⚙️</button>
+  </header>
+
+  <section id="setup-panel" class="setup-panel">
+    <p>貼上你在 <a href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">Teachable Machine</a> 訓練完成並「Export Model → Upload」後取得的圖片模型網址（結尾為 <code>/</code>），例如：<br>
+      <code>https://teachablemachine.withgoogle.com/models/xxxxxxxxx/</code>
+    </p>
+    <div class="setup-row">
+      <input id="model-url" type="url" placeholder="貼上模型網址..." />
+      <button id="load-btn" class="btn-primary" type="button">載入模型並開始</button>
+    </div>
+    <p id="setup-status" class="setup-status"></p>
+  </section>
+
+  <main class="game-area" id="game-area" hidden>
+    <div class="camera-pane">
+      <div class="webcam-wrap">
+        <div id="webcam-container"></div>
+        <div id="effect-layer" class="effect-layer"></div>
+      </div>
+    </div>
+
+    <aside class="result-pane">
+      <div class="result-card">
+        <p class="result-label">目前辨識結果</p>
+        <h2 id="top-class">—</h2>
+        <p id="top-confidence" class="top-confidence">信心分數：0%</p>
+      </div>
+
+      <div id="bars" class="bars"></div>
+
+      <div id="message-box" class="message-box">
+        準備好了嗎？對著攝影機做出動作，看看會發生什麼事！
+      </div>
+
+      <div class="howto">
+        <p><strong>怎麼玩：</strong></p>
+        <ol>
+          <li>讓攝影機清楚拍到你（手勢 / 物品 / 表情，依你訓練的類別而定）。</li>
+          <li>模型每秒會持續辨識並顯示信心分數最高的類別。</li>
+          <li>當信心分數超過 70%，畫面主題與音效會依類別切換。</li>
+        </ol>
+      </div>
+    </aside>
+  </main>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
