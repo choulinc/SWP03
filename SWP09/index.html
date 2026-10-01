@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英文聽讀練習 APP</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🎧 英文聽讀練習</h1>
+    <p class="subtitle">聽發音、跟著念，自動幫你比對發音正確率</p>
+  </header>
+
+  <main>
+    <section class="stats-bar" aria-label="練習統計">
+      <div class="stat">
+        <span class="stat-value" id="statTotal">0</span>
+        <span class="stat-label">已練習</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="statCorrect">0</span>
+        <span class="stat-label">念對</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="statAccuracy">0%</span>
+        <span class="stat-label">正確率</span>
+      </div>
+      <button id="resetStatsBtn" class="ghost-btn">重設統計</button>
+    </section>
+
+    <section class="card" id="practiceCard">
+      <div class="word-row">
+        <h2 id="currentWord">apple</h2>
+        <button id="playBtn" class="icon-btn" title="播放發音" aria-label="播放發音">🔊</button>
+      </div>
+      <p class="word-meaning" id="currentMeaning">蘋果</p>
+
+      <div class="controls">
+        <button id="recordBtn" class="record-btn">🎤 按下開始跟讀</button>
+        <button id="nextBtn" class="secondary-btn">下一個 ▶</button>
+      </div>
+
+      <div class="result" id="resultBox" hidden>
+        <p>你說的是：<span id="heardText">—</span></p>
+        <p id="verdict" class="verdict">—</p>
+      </div>
+
+      <p id="statusMsg" class="status-msg"></p>
+    </section>
+
+    <section class="list-section">
+      <h3>單字／片語清單</h3>
+      <ul id="wordList" class="word-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>使用瀏覽器 Web Speech API（SpeechSynthesis + SpeechRecognition）。建議使用桌機版 Chrome 以獲得最佳相容性。</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
