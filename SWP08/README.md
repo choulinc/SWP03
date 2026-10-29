@@ -1,13 +1,14 @@
 # SWP08 · 召喚師 — Teachable Machine 互動遊戲
 
-用 [Teachable Machine](https://teachablemachine.withgoogle.com) 訓練一個圖片分類模型，
-嵌入這個靜態網頁，透過攝影機即時辨識畫面並觸發主題色、表情符號與音效變化。
+用 [Teachable Machine](https://teachablemachine.withgoogle.com) 訓練的圖片分類模型（Cat / Dog 兩類）
+已直接嵌入這個靜態網頁（`script.js` 中的 `DEFAULT_MODEL_URL`），開啟網頁即自動載入、
+透過攝影機即時辨識畫面並觸發主題色、表情符號與音效變化，不需要額外設定。
 
 ## 怎麼玩 / 怎麼操作
 
-1. 開啟網頁，於設定面板貼上你訓練好的 Teachable Machine 模型網址，按「載入模型並開始」。
+1. 開啟網頁（模型會自動載入，不用手動貼網址）。
 2. 允許瀏覽器使用攝影機權限。
-3. 對著鏡頭做出你訓練的動作、手勢或展示物品（例如「剪刀」「石頭」「布」，或「開心表情」「生氣表情」）。
+3. 對著鏡頭展示貓或狗的圖片 / 玩偶（或任何符合訓練類別的畫面）。
 4. 右側面板會即時顯示：
    - 目前信心分數最高的類別與百分比
    - 所有類別的信心分數長條圖
@@ -19,13 +20,16 @@
 
 ## 訓練模型（至少 2 個類別）
 
+本專案已訓練好 Cat / Dog 兩個類別並把分享連結寫進 `script.js`（`DEFAULT_MODEL_URL`）。
+若要換成自己的模型：
+
 1. 前往 https://teachablemachine.withgoogle.com → 「Get Started」→「Image Project」。
-2. 建立至少 2 個 Class（例如「剪刀」「石頭」「布」，或「比讚」「比愛心」），
-   每個類別用攝影機錄製數十張不同角度 / 距離的範例影像。
+2. 建立至少 2 個 Class，每個類別用攝影機錄製或上傳數十張範例影像。
 3. 按「Train Model」完成訓練，可在右側預覽視窗即時測試辨識效果。
 4. 按「Export Model」→ 選擇「Upload (shareable link)」→「Upload my model」，
    取得形如 `https://teachablemachine.withgoogle.com/models/xxxxxxxxx/` 的網址。
-5. 將網址貼到本網頁的設定面板中即可（會存在瀏覽器 localStorage，下次自動載入）。
+5. 修改 `script.js` 開頭的 `DEFAULT_MODEL_URL` 為這個網址，重新部署即可；
+   也可以點右上角齒輪圖示，在設定面板暫時貼上另一個網址做測試（只存在瀏覽器 localStorage，不影響部署版本）。
 
 > 訓練與推論過程皆在瀏覽器內完成（TensorFlow.js），你的攝影機畫面不會上傳到任何伺服器；
 > 唯一上傳到 Google 的是你在「Export Model」步驟主動儲存的模型本身。

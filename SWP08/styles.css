@@ -111,6 +111,7 @@ html, body {
   grid-template-columns: 1.1fr 1fr;
   gap: 22px;
 }
+.game-area[hidden] { display: none; }
 
 @media (max-width: 760px) {
   .game-area { grid-template-columns: 1fr; }

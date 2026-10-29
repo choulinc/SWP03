@@ -1,4 +1,5 @@
 const STORAGE_KEY = "swp08-tm-model-url";
+const DEFAULT_MODEL_URL = "https://teachablemachine.withgoogle.com/models/JZ_SApREU/";
 const CONFIDENCE_TRIGGER = 0.7;
 const EMOJIS = ["✨", "🔥", "💧", "🌪️", "🌈", "⚡", "🍀", "❄️"];
 
@@ -24,7 +25,8 @@ const messageBox = $("#message-box");
 const stage = $("#stage");
 
 const savedUrl = localStorage.getItem(STORAGE_KEY);
-if (savedUrl) modelUrlInput.value = savedUrl;
+const initialUrl = savedUrl || DEFAULT_MODEL_URL;
+modelUrlInput.value = initialUrl;
 
 setupToggle.addEventListener("click", () => {
   setupPanel.hidden = !setupPanel.hidden;
@@ -40,9 +42,8 @@ loadBtn.addEventListener("click", () => {
   init(url);
 });
 
-if (savedUrl) {
-  init(savedUrl);
-}
+setupPanel.hidden = true;
+init(initialUrl);
 
 async function init(baseUrl) {
   try {
@@ -73,6 +74,7 @@ async function init(baseUrl) {
     requestAnimationFrame(loop);
   } catch (err) {
     console.error(err);
+    setupPanel.hidden = false;
     setupStatus.style.color = "#fca5a5";
     setupStatus.textContent =
       "載入失敗，請確認模型網址正確，且已允許攝影機權限。(" + err.message + ")";
