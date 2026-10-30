@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Dorna2 Embodied Sim｜基於 2026-10-30 GitHub main 99af6e2 的繁體中文技術導讀，含架構、Newton Remote、SDK、GPU、H100 與驗證證據。">
+  <meta name="theme-color" content="#091421">
+  <meta property="og:title" content="Dorna2 · Repository Field Guide">
+  <meta property="og:description" content="以 GitHub main 99af6e2 為基準的 Dorna2 Embodied Sim 技術地圖。">
+  <title>Dorna2 Repo 導讀 · 2026.10.30</title>
+  <style>:root{color-scheme:dark;--bg:#091420;--bg2:#0b1826;--sidebar:#08121d;--surface:#101f2e;--surface2:#132537;--line:#23394c;--muted:#9db2c3;--muted2:#7890a4;--text:#e8f0f5;--strong:#fff;--cyan:#81e4e7;--cyan-dim:#17454b;--purple:#a99be3;--green:#98e4bb;--amber:#efbd83;--shadow:0 22px 70px #0004;--radius:17px}
+html{scroll-behavior:smooth;scroll-padding-top:82px}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.78 -apple-system,BlinkMacSystemFont,"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased}a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:none}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}kbd,code,pre,.mini-label,.section-num,.eyebrow,.stat-label,.device-block small,.sidebar-label,.layer-kicker,.hero-art-top,.hero-art-foot{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}code{font-size:.88em}p{margin:0 0 1em}strong,b{font-weight:680}h1,h2,h3{line-height:1.27;margin-top:0;letter-spacing:-.025em}h1{font-size:clamp(46px,5.3vw,72px);letter-spacing:-.062em;font-weight:790}h2{font-size:clamp(29px,3.3vw,44px);font-weight:730}h3{font-size:19px;font-weight:710}small{font-size:12px}::selection{background:#37929b80;color:#fff}.read-progress{height:2px;position:fixed;top:0;left:0;z-index:40;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .08s linear}.shell{display:flex;min-height:100vh}.sidebar{width:258px;position:fixed;top:0;bottom:0;left:0;background:var(--sidebar);border-right:1px solid var(--line);z-index:20;display:flex;flex-direction:column;padding:29px 16px 18px;overflow:auto}.brand{display:flex;align-items:center;gap:13px;color:var(--text);padding:0 12px 32px}.brand:hover{color:var(--text)}.brand-mark{height:42px;width:42px;flex-shrink:0;display:grid;place-items:center;border:1px solid #4e8690;background:linear-gradient(145deg,#235463,#153047);border-radius:12px;color:#ddffff;font-size:18px;font-weight:850;letter-spacing:-2px}.brand-mark span{font-size:12px;transform:translateY(3px)}.brand strong{display:block;letter-spacing:.14em;font-size:12px}.brand small{display:block;letter-spacing:.08em;font:10px/1.8 Consolas,monospace;color:var(--muted2)}.sidebar-label{font-size:9px;letter-spacing:.14em;color:var(--muted2);padding:0 13px 10px;font-weight:700}.side-nav{display:flex;flex-direction:column;gap:3px}.side-nav>a{display:flex;align-items:center;gap:11px;color:var(--muted);font-size:12.5px;font-weight:560;padding:11px 12px;border-radius:9px;border:1px solid transparent;white-space:nowrap}.side-nav>a>span{font:10px/1 Consolas,monospace;color:var(--muted2);width:17px;flex:none}.side-nav>a:hover{background:#ffffff0a;color:var(--strong)}.side-nav>a.active{background:#1b3d42;border-color:#376269;color:#cffff8}.side-nav>a.active span{color:#a5f8f5}.new{font-size:8px;color:var(--green);font-family:Consolas,monospace;letter-spacing:.04em;margin-left:auto}.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding:22px 13px 8px}.sidebar-bottom p{font:10px/1 Consolas,monospace;color:var(--green);letter-spacing:.1em;display:flex;gap:8px;align-items:center;margin-bottom:12px}.sidebar-bottom code{color:var(--text);font-size:12px}.quiet-link{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding-top:13px}.pulse{height:7px;width:7px;display:inline-block;border-radius:50%;background:var(--green);box-shadow:0 0 13px #61d3a677;flex:none}.workspace{margin-left:258px;min-width:0;flex:1}.topbar{position:sticky;top:0;height:68px;z-index:12;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(28px,5vw,78px);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(19px);border-bottom:1px solid var(--line)}.breadcrumbs{font-size:10px;letter-spacing:.12em;color:var(--muted2);font-weight:720}.breadcrumbs i{font-style:normal;opacity:.5;padding:0 12px}.breadcrumbs strong{color:var(--text)}.topbar-right{display:flex;gap:9px;align-items:center}.search-button,.icon-btn,.github-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);height:35px;border-radius:8px;background:var(--surface);color:var(--muted);padding:0 13px;font-size:11px}.search-button:hover,.icon-btn:hover,.github-button:hover{color:var(--text);border-color:#4f8694}.search-symbol{font-size:22px;line-height:1}.search-button kbd{font-size:11px;border:1px solid var(--line);padding:0 5px;border-radius:3px;margin-left:22px;line-height:1.6}.icon-btn{padding:0;width:36px;font-size:17px}.github-button{color:var(--text)}.github-button span{font-size:14px;color:var(--muted2)}.mobile-menu{display:none}.content{width:min(100%,1320px);padding:0 clamp(28px,5vw,78px) 42px;margin:auto}.doc-section{padding:78px 0 82px;border-bottom:1px solid var(--line);scroll-margin-top:72px}.doc-section:last-child{border-bottom:none}.hero-section{padding-top:65px}.eyebrow,.section-num{font-size:11px;letter-spacing:.18em;font-weight:750;color:var(--cyan)}.eyebrow{display:flex;align-items:center;gap:12px}.eyebrow-line{width:26px;height:1px;background:var(--cyan)}.hero-layout{display:grid;grid-template-columns:1.03fr .97fr;gap:24px;align-items:center;margin-top:36px}.hero-meta{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:23px}.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:30px;font:10px/1 Consolas,monospace;padding:8px 11px;color:var(--muted);letter-spacing:.035em}.pill-live{border-color:#31594f;background:#112e2a;color:var(--green)}.pill-green{color:var(--green);border-color:#31594f;background:#112e2a}.pill-amber{color:var(--amber);border-color:#5c4630;background:#342619}.hero-copy h1{margin:0 0 25px}.hero-copy h1 em{font-style:normal;color:var(--cyan);white-space:nowrap}.hero-lead{color:var(--muted);font-size:15px;max-width:560px;line-height:1.95}.hero-lead strong{color:var(--text)}.hero-actions{display:flex;align-items:center;gap:12px;margin-top:29px;flex-wrap:wrap}.primary-cta,.secondary-cta{display:inline-flex;gap:18px;align-items:center;border-radius:9px;font-weight:710;font-size:12px;padding:13px 17px;transition:transform .2s ease}.primary-cta{background:var(--cyan);color:#09252a}.secondary-cta{border:1px solid var(--line);color:var(--text)}.primary-cta:hover,.secondary-cta:hover{transform:translateY(-2px)}.hero-art{border:1px solid #426273;border-radius:20px;background:radial-gradient(circle at 52% 44%,#24485a 0%,#122637 47%,#0a1723 100%);box-shadow:inset 0 0 60px #4ec1c316;overflow:hidden;color:#84b9bf;min-width:0}.hero-art-top,.hero-art-foot{display:flex;justify-content:space-between;padding:14px 18px;font-size:9px;letter-spacing:.08em;color:#a1ccd0}.hero-art-top{border-bottom:1px solid #ffffff14}.hero-art-foot{border-top:1px solid #ffffff14}.robot-svg{display:block;width:100%;height:auto}.svg-annotations path{fill:none;stroke:#91d2d6;stroke-dasharray:3 4;opacity:.7}.svg-annotations text{fill:#bddedf;font-size:12px;font-family:Consolas,monospace}.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--line);margin-top:42px}.stat{background:var(--surface);padding:22px 21px}.stat-label{font-size:10px;color:var(--muted2);letter-spacing:.07em}.stat strong{display:block;font:700 clamp(22px,2.3vw,29px)/1.8 Consolas,monospace;letter-spacing:-.055em;color:var(--strong)}.stat small{color:var(--muted);display:block;line-height:1.6}.stat .inline-small{font-size:14px;display:inline;color:inherit}.stat .success-text{color:var(--green)}.intro-note{margin-top:23px;padding:18px 21px;display:flex;gap:15px;align-items:flex-start;border:1px solid #3e5360;background:linear-gradient(90deg,#18313b,var(--surface));border-radius:11px}.intro-note .note-icon{width:22px;height:22px;border:1px solid var(--cyan);color:var(--cyan);font-size:13px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;font-weight:900}.intro-note p{margin:0;font-size:12px;color:var(--muted)}.intro-note p strong{color:var(--text)}.intro-note.caution{border-color:#695235;background:linear-gradient(90deg,#30251d,var(--surface))}.intro-note.caution .note-icon{border-color:var(--amber);color:var(--amber)}.section-head{margin-bottom:35px}.section-head .section-num{display:block;margin-bottom:14px}.section-head h2{margin:0 0 14px}.section-head p{max-width:790px;color:var(--muted);margin:0;font-size:14px;line-height:1.95}.section-head p strong{color:var(--text)}.section-head code{color:var(--cyan)}.release-grid,.two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.release-card,.surface{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:25px;min-width:0}.release-card{position:relative;overflow:hidden}.release-card::after{content:"";position:absolute;top:0;left:0;width:70px;height:2px;background:var(--cyan)}.release-card:nth-child(2)::after{background:var(--purple)}.release-top{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:24px}.mini-label{font-size:10px;letter-spacing:.1em;color:var(--muted2);font-weight:750}.release-card h3{font-size:20px;line-height:1.45;margin-bottom:13px}.release-card p,.surface p{font-size:13px;color:var(--muted);line-height:1.9}.release-card code,.surface code{color:var(--cyan)}.inline-link{font-size:12px;font-weight:700;display:inline-flex;align-items:center}.delta-panel{margin-top:18px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(110deg,#162c36,var(--surface));padding:26px 29px;display:grid;grid-template-columns:.55fr 1fr;gap:40px}.delta-panel h3{margin:12px 0}.delta-list{margin:0;padding-left:21px;color:var(--muted);font-size:13px}.delta-list li{padding-left:5px;margin:0 0 9px}.delta-list strong{color:var(--text)}.architecture-map{display:flex;gap:0;align-items:stretch}.layer{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:25px 21px;min-width:0}.layer-blue{border-top:3px solid var(--cyan)}.layer-purple{border-top:3px solid var(--purple)}.layer-green{border-top:3px solid var(--green)}.layer-kicker{font-size:10px;color:var(--muted2);letter-spacing:.08em}.layer h3{font-size:21px;margin:15px 0 5px}.layer code{color:var(--cyan);font-size:11px;overflow-wrap:anywhere}.layer p{font-size:12px;color:var(--muted);margin:15px 0 17px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{font-size:10px;color:var(--muted);border-radius:20px;background:#ffffff0a;border:1px solid var(--line);padding:3px 8px}.layer-connect{display:flex;flex-direction:column;justify-content:center;align-items:center;width:38px;flex:none;gap:6px}.layer-connect span{font:8px Consolas,monospace;color:var(--muted2);writing-mode:vertical-rl}.layer-connect div{color:var(--cyan);font-size:18px}.remote-strip{display:flex;align-items:center;gap:17px;margin-top:18px;padding:21px;border:1px solid #446570;border-radius:13px;background:#112733}.remote-strip-icon{font-size:25px;color:var(--cyan)}.remote-strip>div:nth-child(2){flex:1}.remote-strip strong{font-size:14px}.remote-strip p{font-size:12px;color:var(--muted);margin:4px 0 0}.remote-strip code{color:var(--cyan)}.split-block{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:34px;align-items:start}.split-block h3{font-size:17px;margin:0 0 10px}.split-block p{font-size:13px;color:var(--muted)}.flow-code{font:11px/2 Consolas,monospace;color:var(--text);background:var(--surface);border:1px solid var(--line);padding:12px;border-radius:8px}.flow-code span{color:var(--cyan)}.joint-table{margin:16px 0}.joint-table>div{display:grid;grid-template-columns:36px 1fr auto;gap:12px;border-bottom:1px solid var(--line);align-items:center;padding:11px 0;font-size:12px}.joint-table b{color:var(--cyan);font:700 12px Consolas,monospace}.joint-table span{color:var(--muted)}.joint-table code{font-size:11px;color:var(--text)}.muted{color:var(--muted)!important}.small{font-size:12px!important}.equation{background:#071824;border:1px solid var(--line);padding:21px 18px;margin:18px 0;color:var(--cyan);font:500 clamp(16px,1.8vw,21px)/1.6 Georgia,serif;text-align:center;border-radius:9px;white-space:nowrap;overflow-x:auto}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:19px}.facts>div{background:var(--surface2);padding:11px;border-radius:8px}.facts span{display:block;font-size:10px;color:var(--muted2);margin-bottom:6px}.facts strong{display:block;font:700 12px Consolas,monospace;color:var(--text)}.facts-two{grid-template-columns:repeat(2,1fr)}.code-frame{overflow:hidden;border-radius:13px;border:1px solid #304757;background:#07121c;margin:22px 0 0}.code-top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #243d50;color:#a3bdc8;font:11px Consolas,monospace;gap:12px}.code-top>span{display:flex;align-items:center;gap:9px}.dot{height:7px;width:7px;border-radius:50%;background:var(--green)}.copy-code{background:#152a38;color:#bad2da;border:1px solid #294358;padding:6px 10px;border-radius:5px;font:10px Consolas,monospace}.copy-code:hover{border-color:var(--cyan);color:var(--cyan)}pre{white-space:pre;overflow:auto;margin:0;padding:21px 23px;color:#c9e7ea;font:12px/1.95 Consolas,"Liberation Mono",monospace;tab-size:4}.source-line{font-size:11px;color:var(--muted2);margin:21px 0 0;overflow-wrap:anywhere}.source-line a{color:var(--cyan)}.stepper{margin:25px 0 19px}.stepper>div{display:grid;grid-template-columns:27px 1fr;grid-template-rows:auto auto;gap:0 12px;padding:0 0 23px;position:relative}.stepper>div:not(:last-child)::after{content:"";height:calc(100% - 29px);border-left:1px dashed #51788a;position:absolute;left:12px;top:28px}.stepper span{width:26px;height:26px;border:1px solid #3b7180;color:var(--cyan);border-radius:50%;display:grid;place-items:center;font:10px Consolas,monospace;grid-row:1/3}.stepper strong{font-size:13px}.stepper small{color:var(--muted2);font-size:11px}.warning-inline{border-left:2px solid var(--amber);background:#392c211b;padding:10px 13px;color:var(--muted);font-size:11px}.mini-table-wrap{margin-top:20px;overflow:auto;border:1px solid var(--line);border-radius:11px;background:var(--surface)}table{border-collapse:collapse;width:100%;text-align:left;font-size:12px}th,td{padding:13px 17px;border-bottom:1px solid var(--line);vertical-align:top}th{font:700 10px/1.8 Consolas,monospace;color:var(--muted2);background:#152434;letter-spacing:.045em}tbody tr:last-child td{border-bottom:none}td{color:var(--muted)}td:first-child{color:var(--text)}.file-path{font:11px Consolas,monospace;color:var(--cyan);overflow-wrap:anywhere}.remote-diagram{display:grid;grid-template-columns:1fr 0.72fr 1fr;align-items:center;padding:20px;border:1px solid #39616d;border-radius:17px;background:linear-gradient(105deg,#13303a,#101f2e 60%,#1a2639)}.device-block{padding:22px;border:1px solid #44616c;border-radius:14px;background:#102634;min-height:245px}.device-server{background:#172639}.device-icon{font-size:27px;color:var(--cyan);display:block;height:50px}.device-block strong{display:block;font-size:16px}.device-block small{display:block;font:11px/1.8 Consolas,monospace;color:var(--cyan);margin:6px 0 13px}.device-block ul{font-size:11px;color:var(--muted);padding-left:16px;line-height:1.9;margin:0}.connection-block{text-align:center;padding:5px;color:var(--cyan)}.connection-block span{font:10px/1.7 Consolas,monospace;display:block}.connection-line{position:relative;border-top:1px dashed #5a9c9e;margin:24px 0}.connection-line i{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:22px;font-style:normal;background:#132b35;padding:0 8px}.connection-block small{font:10px/1.9 Consolas,monospace;color:var(--muted)}.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:17px}.surface.compact{padding:21px}.surface.compact h3{font-size:17px;margin:10px 0}.surface.compact p{margin-bottom:0}.split-top{margin-top:29px}.info-mini{background:#172936;padding:14px 17px;border:1px solid #344e5d;border-radius:11px}.info-mini p{font-size:12px;margin:8px 0 0;color:var(--muted)}.info-mini.full{margin-top:19px}.metric-ribbon{display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface)}.metric-ribbon>div{padding:18px;border-right:1px solid var(--line)}.metric-ribbon>div:last-child{border:0}.metric-ribbon span,.metric-ribbon small{display:block;color:var(--muted2);font-size:10px}.metric-ribbon strong{display:block;color:var(--text);font:700 clamp(17px,1.8vw,22px)/2 Consolas,monospace}.result-header{display:flex;justify-content:space-between;align-items:center;gap:12px}.result-header h3{margin:8px 0 0}.result-bars{margin:18px 0 25px;border:1px solid var(--line);border-radius:15px;padding:21px;background:var(--surface)}.result-row{display:grid;grid-template-columns:200px 1fr 66px;align-items:center;gap:20px;padding:12px 0}.result-name strong{display:block;font-size:12px}.result-name small{font-size:10px;color:var(--muted2)}.bar-track{height:13px;border-radius:20px;background:#243746;overflow:hidden}.bar-fill{height:100%;border-radius:20px}.bar-fill.ik{background:linear-gradient(90deg,#68d5a5,#a8ebbd)}.bar-fill.ppo{background:linear-gradient(90deg,#409dc1,#8fe2ed)}.bar-fill.zero{background:var(--amber)}.result-row>strong{text-align:right;font:700 15px Consolas,monospace;color:var(--text)}.ur10-rates{display:grid;gap:11px;margin:22px 0}.ur10-rates>div{display:grid;grid-template-columns:45px 1fr 49px;gap:10px;align-items:center;font:11px Consolas,monospace;color:var(--muted)}.ur10-rates div>div{height:8px;background:#243746;border-radius:9px;overflow:hidden}.ur10-rates i{display:block;height:100%;background:var(--purple);border-radius:9px}.ur10-rates b{text-align:right;color:var(--text)}.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}.evidence{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:21px}.ev-icon{height:29px;width:29px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px}.ev-icon.yes{color:var(--green);border:1px solid #43745e;background:#18382f}.ev-icon.pending{color:var(--amber);border:1px solid #745839;background:#342719}.evidence h3{font-size:17px;margin:19px 0 11px}.evidence p{font-size:12px;color:var(--muted);min-height:106px}.ev-label{display:block;font:10px/1.6 Consolas,monospace}.yes-label{color:var(--green)}.pending-label{color:var(--amber)}.version-stack{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;margin:18px 0;font-size:12px}.version-stack span{color:var(--muted)}.version-stack code{color:var(--text)!important;text-align:right}.ci-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}.ci-grid article{border:1px solid #386050;background:linear-gradient(155deg,#143129,var(--surface));border-radius:14px;padding:22px}.ci-status{font:700 10px Consolas,monospace;color:var(--green);display:flex;align-items:center;gap:8px}.ci-grid h3{margin:16px 0 10px;font:700 18px Consolas,monospace}.ci-grid p{color:var(--muted);font-size:12px;margin:0}.subheading{margin:33px 0 15px}.timeline{padding-top:4px}.tl{display:grid;grid-template-columns:80px 22px 1fr;gap:13px;position:relative}.tl time{color:var(--muted2);font:11px/24px Consolas,monospace}.tl-dot{height:11px;width:11px;border-radius:50%;border:2px solid var(--cyan);background:var(--bg);margin:6px auto;z-index:1}.tl::after{content:"";position:absolute;top:15px;bottom:-15px;left:103px;border-left:1px dashed #3b5a6d}.tl-last::after{display:none}.tl>div:last-child{padding:0 0 29px}.tl h3{font-size:16px;margin:0 0 5px}.tl p{font-size:12px;color:var(--muted);max-width:790px;margin:0}.tl a{font-size:11px;margin-top:6px;display:inline-block}.learning-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.learning-grid>a{display:block;position:relative;padding:22px 19px;background:var(--surface);border:1px solid var(--line);border-radius:13px;min-height:159px;color:var(--text);transition:transform .2s,border-color .2s}.learning-grid>a:hover{border-color:#65a7ae;transform:translateY(-3px)}.learning-grid span{font:700 11px Consolas,monospace;color:var(--cyan)}.learning-grid h3{font-size:14px;margin:14px 0 7px}.learning-grid p{font:10px/1.6 Consolas,monospace;color:var(--muted2);margin:0;overflow-wrap:anywhere}.learning-grid b{position:absolute;right:18px;top:18px;font-size:14px;color:var(--muted2)}.reference-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.ref-group{padding:22px;background:var(--surface);border:1px solid var(--line);border-radius:13px}.ref-group h3{font-size:14px;margin:0 0 19px}.ref-group a{display:block;font:11px/1.6 Consolas,monospace;padding:9px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.ref-group a:last-child{border:0}.site-footer{margin-top:77px;padding-top:23px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--muted2);font-size:11px;gap:15px}.site-footer strong{font-size:12px;color:var(--text);letter-spacing:.1em;margin-right:15px}.site-footer a{color:var(--muted)}.search-overlay{display:none;position:fixed;inset:0;background:#050d17c7;backdrop-filter:blur(7px);z-index:45;padding:12vh 20px}.search-overlay.open{display:flex;justify-content:center;align-items:flex-start}.search-panel{width:min(610px,100%);background:var(--surface);border:1px solid #427c8c;box-shadow:var(--shadow);border-radius:15px;overflow:hidden}.search-top{display:flex;align-items:center;gap:14px;padding:16px 19px;border-bottom:1px solid var(--line)}.search-top span{font-size:27px;color:var(--cyan)}.search-top input{flex:1;outline:none!important;border:0;background:transparent;color:var(--text);font-size:14px;min-width:0}.search-top input::placeholder{color:var(--muted2)}.search-top button{color:var(--muted2);border:1px solid var(--line);background:transparent;border-radius:5px;font:10px Consolas,monospace;padding:5px 7px}.search-hint{padding:9px 18px;font:10px Consolas,monospace;color:var(--muted2);border-bottom:1px solid var(--line)}.search-results{max-height:370px;overflow:auto;padding:8px}.search-results button{display:flex;align-items:center;gap:16px;width:100%;text-align:left;border:1px solid transparent;background:transparent;color:var(--text);border-radius:9px;padding:11px 13px;font-size:13px}.search-results button:hover,.search-results button.selected{background:#1e3c46;border-color:#3d6a70}.search-results button span{color:var(--cyan);font:10px Consolas,monospace}.search-results button small{margin-left:auto;color:var(--muted2)}.search-results .no-results{padding:25px;color:var(--muted);font-size:12px}.sidebar-overlay{display:none}
+html[data-theme="light"]{color-scheme:light;--bg:#f4f8fa;--bg2:#f9fbfc;--sidebar:#eaf2f5;--surface:#fff;--surface2:#f1f5f7;--line:#cddbe2;--muted:#526778;--muted2:#657988;--text:#192c36;--strong:#0f2836;--cyan:#136f82;--cyan-dim:#d9f2f4;--purple:#6751a2;--green:#1d7651;--amber:#99571b;--shadow:0 22px 70px #1b334222}html[data-theme="light"] .hero-art{color:#a1d5d7}html[data-theme="light"] .pill-live,html[data-theme="light"] .pill-green{background:#e0f4e9;border-color:#b4d9c2}html[data-theme="light"] .pill-amber{background:#fff3e1;border-color:#e4cfac}html[data-theme="light"] .side-nav>a.active{background:#d4edf0;border-color:#b1d3d9;color:#176173}html[data-theme="light"] .brand-mark,html[data-theme="light"] .device-block{color:#d9f6fb}html[data-theme="light"] .intro-note{background:#e5f1f5}html[data-theme="light"] .intro-note.caution{background:#f8f0e7}html[data-theme="light"] .delta-panel{background:#ecf4f7}html[data-theme="light"] .remote-strip{background:#e2f2f4}html[data-theme="light"] .warning-inline{background:#fcf2e5}html[data-theme="light"] .code-frame{background:#101d28}html[data-theme="light"] .code-top{color:#c2d8e3}html[data-theme="light"] .flow-code,html[data-theme="light"] .equation{background:#f0f5f8}html[data-theme="light"] .ci-grid article{background:linear-gradient(135deg,#e3f6ed,#fff)}html[data-theme="light"] .evidence{background:#fff}html[data-theme="light"] .search-overlay{background:#132d3b70}html[data-theme="light"] .hero-copy h1 em{color:#17778b}html[data-theme="light"] .primary-cta{background:#16869a;color:#fff}html[data-theme="light"] .hero-art .hero-art-top,html[data-theme="light"] .hero-art .hero-art-foot{color:#b9eced}html[data-theme="light"] .layer code,html[data-theme="light"] .surface code{color:#166e84}html[data-theme="light"] .version-stack code{color:#233d4a!important}html[data-theme="light"] .sidebar-bottom .pulse,html[data-theme="light"] .ci-status .pulse{box-shadow:none}html[data-theme="light"] .connection-block{color:#a9ebed}html[data-theme="light"] .device-block small{color:#98e5e6}html[data-theme="light"] .device-block ul{color:#bad2d9}html[data-theme="light"] .device-block strong{color:#e4f6f8}html[data-theme="light"] .connection-line i{background:#16323c;color:#d7f7f6}html[data-theme="light"] .remote-diagram{background:#16303d}html[data-theme="light"] .connection-block small,html[data-theme="light"] .connection-block span{color:#b9dce2}
+@media(min-width:1500px){.content{padding-left:80px;padding-right:80px}}@media(max-width:1280px){.hero-layout{grid-template-columns:1fr .9fr}.stat{padding:17px}.layer{padding:20px 15px}.result-row{grid-template-columns:180px 1fr 64px}}@media(max-width:1100px){.sidebar{width:222px}.workspace{margin-left:222px}.topbar{padding:0 28px}.content{padding-left:28px;padding-right:28px}.side-nav>a{font-size:11.5px}.hero-layout{grid-template-columns:1fr}.hero-art{max-width:570px;justify-self:center;width:100%}.hero-copy h1{font-size:58px}.architecture-map{flex-direction:column}.layer-connect{flex-direction:row;width:100%;height:27px}.layer-connect span{writing-mode:horizontal-tb}.delta-panel{grid-template-columns:1fr;gap:10px}.stat-grid{grid-template-columns:repeat(2,1fr)}.result-row{grid-template-columns:145px 1fr 57px;gap:10px}.evidence p{min-height:150px}}@media(max-width:850px){.sidebar{transform:translateX(-100%);transition:transform .22s;width:270px}.sidebar.open{transform:translateX(0)}.sidebar-overlay.open{display:block;position:fixed;inset:0;background:#03090bd1;z-index:19}.workspace{margin-left:0}.mobile-menu{display:inline-flex}.topbar{gap:14px;justify-content:initial}.topbar-right{margin-left:auto}.breadcrumbs{flex:1}.content{max-width:740px}.hero-art{max-width:540px}.stat-grid{grid-template-columns:repeat(4,1fr)}.stat strong{font-size:21px}.evidence p{min-height:auto}}@media(max-width:680px){.topbar{padding:0 16px;height:59px}.breadcrumbs span,.breadcrumbs i{display:none}.search-button{width:35px;padding:0;font-size:0}.search-button .search-symbol{font-size:22px}.search-button kbd{display:none}.github-button{padding:0 10px;font-size:0;gap:0}.github-button span{display:none}.github-button svg{width:16px;height:16px}.content{padding:0 19px 25px}.hero-section{padding-top:37px}.doc-section{padding:52px 0 60px}.eyebrow{font-size:9px}.hero-layout{margin-top:24px}.hero-copy h1{font-size:clamp(46px,10vw,63px)}.hero-copy h1 em{white-space:normal}.hero-lead{font-size:13px}.hero-art{margin-top:19px}.stat-grid{grid-template-columns:repeat(2,1fr);margin-top:24px}.stat{padding:16px}.stat strong{font-size:22px}.release-grid,.two-col,.split-block,.three-col,.evidence-grid,.ci-grid,.learning-grid,.reference-grid{grid-template-columns:1fr}.delta-panel{padding:20px}.architecture-map{display:grid}.layer-connect{height:25px}.remote-strip{align-items:flex-start;flex-wrap:wrap}.remote-strip>div:nth-child(2){flex-basis:80%}.remote-diagram{grid-template-columns:1fr;padding:15px}.connection-block{padding:8px}.connection-line{margin:12px 0}.device-block{min-height:initial}.metric-ribbon{grid-template-columns:repeat(2,1fr)}.metric-ribbon>div:nth-child(2){border-right:0}.metric-ribbon>div:nth-child(1),.metric-ribbon>div:nth-child(2){border-bottom:1px solid var(--line)}.result-header{align-items:flex-start;flex-direction:column}.result-row{grid-template-columns:1fr 50px;gap:5px 10px;margin-bottom:11px}.result-name{grid-column:1/3}.result-row .bar-track{grid-column:1}.result-row>strong{grid-column:2}.joint-table>div{gap:7px}.site-footer{align-items:flex-start;flex-direction:column}.tl{grid-template-columns:64px 18px 1fr;gap:9px}.tl::after{left:82px}.search-overlay{padding-top:10vh}.search-panel{max-height:80vh}.surface,.release-card{padding:21px}.code-frame pre{font-size:11px;padding:15px}.stat small{font-size:10px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+
+</head>
+<body>
+  <div class="read-progress" id="read-progress"></div>
+  <div class="shell" id="top">
+    <aside class="sidebar" id="sidebar" aria-label="文件目錄">
+      <a class="brand" href="#top" aria-label="回到網站頂端"><span class="brand-mark">D<span>2</span></span><span><strong>DORNA2</strong><small>REPOSITORY GUIDE</small></span></a>
+      <div class="sidebar-label">FIELD GUIDE / 2026.10.30</div>
+      <nav class="side-nav" id="side-nav">
+        <a href="#overview" class="active"><span>01</span> 導讀首頁</a>
+        <a href="#updates"><span>02</span> 10/30 最新變更 <b class="new">NEW</b></a>
+        <a href="#architecture"><span>03</span> 系統架構</a>
+        <a href="#foundation"><span>04</span> 核心模型與控制</a>
+        <a href="#cad-sdk"><span>05</span> CAD 與離線 SDK</a>
+        <a href="#remote"><span>06</span> Mac Newton Remote <b class="new">NEW</b></a>
+        <a href="#gpu"><span>07</span> GPU / PPO 實驗</a>
+        <a href="#h100"><span>08</span> H100 與 CUDA 12 <b class="new">NEW</b></a>
+        <a href="#validation"><span>09</span> 驗證與 CI</a>
+        <a href="#timeline"><span>10</span> Git 開發歷程</a>
+        <a href="#learning"><span>11</span> 閱讀與實作路線</a>
+        <a href="#references"><span>12</span> 檔案索引與來源</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <p><span class="pulse"></span> VERIFIED SNAPSHOT</p>
+        <code>main / 99af6e2</code>
+        <a class="quiet-link" href="https://github.com/choulinc/dorna2-embodied-sim/commit/99af6e2113cfdf4ef3fc04e36c153db29ac50243" target="_blank" rel="noopener noreferrer">開啟對應 commit <span>↗</span></a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="workspace">
+      <header class="topbar">
+        <button id="menu-toggle" class="icon-btn mobile-menu" type="button" aria-label="開啟導覽選單" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <div class="breadcrumbs"><span>KNOWLEDGE BASE</span><i>/</i><strong>Repo Field Guide</strong></div>
+        <div class="topbar-right">
+          <button id="search-button" class="search-button" type="button" aria-label="搜尋頁面"><span class="search-symbol">⌕</span> 搜尋內容 <kbd>/</kbd></button>
+          <button id="theme-button" class="icon-btn theme-btn" type="button" aria-label="切換深淺色模式" title="切換深淺色模式">◐</button>
+          <a class="github-button" href="https://github.com/choulinc/dorna2-embodied-sim" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.05c-3.1.67-3.75-1.32-3.75-1.32-.51-1.28-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.12.08 1.71 1.15 1.71 1.15 1 .17 1.67.11 2.07-.14.1-.73.39-1.23.71-1.51-2.48-.28-5.09-1.24-5.09-5.48 0-1.21.43-2.2 1.15-2.98-.12-.28-.5-1.41.1-2.95 0 0 .94-.3 3.05 1.14A10.63 10.63 0 0 1 12 6.1c.95 0 1.89.13 2.78.38 2.11-1.44 3.05-1.14 3.05-1.14.6 1.54.22 2.67.11 2.95.71.78 1.14 1.77 1.14 2.98 0 4.25-2.61 5.2-5.09 5.47.4.35.75 1.02.75 2.06V22c0 .3.21.64.77.53A11.1 11.1 0 0 0 12 .9Z"/></svg> GitHub <span>↗</span></a>
+        </div>
+      </header>
+      <main class="content">
+        <section id="overview" class="hero-section doc-section" data-title="導讀首頁" data-keywords="主頁 簡介 overview snapshot">
+          <div class="eyebrow"><span class="eyebrow-line"></span> REPOSITORY FIELD GUIDE · V2</div>
+          <div class="hero-layout">
+            <div class="hero-copy">
+              <div class="hero-meta"><span class="pill pill-live"><span class="pulse"></span> 2026 / 10 / 30</span><span class="pill">SOURCE: main</span></div>
+              <h1>Dorna2<br><em>Embodied Sim</em></h1>
+              <p class="hero-lead">從五軸 MuJoCo 模型，到 RTX 上的 GPU / PPO 實驗，再到 <strong>Mac 原生 Newton Viewer 與 H100 遠端模擬控制</strong>。依最新 repository 實作與驗證紀錄整理的中文技術地圖。</p>
+              <div class="hero-actions"><a class="primary-cta" href="#updates">查看本次更新 <span>↗</span></a><a class="secondary-cta" href="#architecture">探索架構 <span>↓</span></a></div>
+            </div>
+            <div class="hero-art" aria-label="五軸 Dorna2 機器手臂示意圖">
+              <div class="hero-art-top"><span>DORNA / 05 DOF</span><span>SIMULATION MODEL</span></div>
+              <svg class="robot-svg" viewBox="0 0 520 390" role="img" aria-label="五軸機器人示意，並非真實 CAD 比例">
+                <defs><linearGradient id="arm-g" x1="0" x2="1" y1="1" y2="0"><stop offset="0" stop-color="#43a8d5"/><stop offset="1" stop-color="#8ff2e4"/></linearGradient><linearGradient id="arm-g2" x1="0" x2="1"><stop offset="0" stop-color="#24516e"/><stop offset="1" stop-color="#397d9a"/></linearGradient><pattern id="grid-p" width="27" height="27" patternUnits="userSpaceOnUse"><path d="M27 0H0V27" fill="none" stroke="currentColor" stroke-width=".65" opacity=".14"/></pattern></defs>
+                <rect x="0" y="0" width="520" height="390" fill="url(#grid-p)"/>
+                <path d="M46 321 261 364 478 308" fill="none" stroke="#5a8298" stroke-width="1" opacity=".4"/>
+                <path d="M80 342 270 297 443 342" fill="none" stroke="#5a8298" stroke-width="1" opacity=".3"/>
+                <ellipse cx="203" cy="311" rx="115" ry="23" fill="#54c9d7" opacity=".07"/>
+                <path d="M146 298 216 271 272 284 198 315Z" fill="#243e50" stroke="#64889a" stroke-width="1.5"/>
+                <path d="M170 274 209 259 244 269 205 286Z" fill="#5d8291"/>
+                <path d="M170 274 170 299 205 315 205 286Z" fill="#1d394d"/>
+                <path d="M205 286 244 269 244 294 205 315Z" fill="#33566c"/>
+                <path d="M204 276 204 226" stroke="url(#arm-g2)" stroke-width="39" stroke-linecap="round"/>
+                <path d="M210 224 274 163" stroke="url(#arm-g)" stroke-width="37" stroke-linecap="round"/>
+                <path d="M274 163 344 195" stroke="url(#arm-g2)" stroke-width="31" stroke-linecap="round"/>
+                <path d="M344 195 396 147" stroke="url(#arm-g)" stroke-width="27" stroke-linecap="round"/>
+                <path d="M396 147 430 148" stroke="#c3e1e2" stroke-width="21" stroke-linecap="round"/>
+                <path d="M428 136V160M446 138V158" stroke="#e3f6ec" stroke-width="7" stroke-linecap="round"/>
+                <g fill="#0d2638" stroke="#a0e9ed" stroke-width="4"><circle cx="204" cy="227" r="23"/><circle cx="274" cy="163" r="22"/><circle cx="344" cy="195" r="20"/><circle cx="396" cy="147" r="16"/></g>
+                <g fill="#9bdeec"><circle cx="204" cy="227" r="9"/><circle cx="274" cy="163" r="9"/><circle cx="344" cy="195" r="8"/><circle cx="396" cy="147" r="6"/></g>
+                <g class="svg-annotations"><path d="M200 254H103"/><path d="M273 142 245 99H178"/><path d="M354 211 397 238H469"/><path d="M398 122 424 86H476"/><text x="61" y="249">J0 · J1</text><text x="152" y="91">J2</text><text x="425" y="253">J3</text><text x="451" y="78">J4</text></g>
+                <circle cx="204" cy="227" r="47" fill="none" stroke="#9de6d7" stroke-dasharray="3 7" opacity=".45"/>
+                <path d="M451 146h38m-17-18v36" fill="none" stroke="#f8be85" stroke-width="1.6"/>
+                <text x="420" y="184" fill="#e9c8a8" font-family="monospace" font-size="12">TCP</text>
+              </svg>
+              <div class="hero-art-foot"><span>SIMULATED / 5 AXES</span><span>SCHEMATIC — NOT CAD</span></div>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">LATEST MAIN</span><strong>99af6e2</strong><small>2026.10.30 · PR #8</small></div>
+            <div class="stat"><span class="stat-label">LATEST CI</span><strong class="success-text">3 / 3</strong><small>validate · SDK · CAD/USD</small></div>
+            <div class="stat"><span class="stat-label">DORNA PPO</span><strong>47.0%</strong><small>RTX · 單 seed · 1,000 episodes</small></div>
+            <div class="stat"><span class="stat-label">H100 REMOTE</span><strong>150+ <small class="inline-small">frames</small></strong><small>Mac ViewerGL 實際收到</small></div>
+          </div>
+          <div class="intro-note"><div class="note-icon">!</div><p><strong>解讀前先確認範圍：</strong>這不是校準過的實機 digital twin；<strong>CPU MuJoCo、RTX PPO、H100 遠端 Newton</strong> 是不同的執行／驗證路徑。資料以 repo 所記錄的實驗為依據，沒有替你重新跑 H100 或機器人硬體測試。</p></div>
+        </section>
+
+        <section id="updates" class="doc-section" data-title="10/30 最新變更" data-keywords="PR pull request 最新更新 修復 newton native sdk cuda12">
+          <div class="section-head"><span class="section-num">02 / CHANGELOG</span><h2>10/30 最新變更</h2><p>從舊站的 <code>b818c63</code> 到最新 <code>99af6e2</code>，變化不只是檔案數量，而是加入完整的原生遠端控制使用情境與更嚴謹的驗收邊界。</p></div>
+          <div class="release-grid">
+            <article class="release-card"><div class="release-top"><span class="mini-label">PR #7 · 2026.10.30</span><span class="pill pill-green">MERGED</span></div><h3>Mac 原生 Newton ViewerGL<br>＋官方 SDK 遠端控制</h3><p>Mac 本地以 Newton 1.6.1 原版 ViewerGL 繪圖；H100 傳送姿態資料，鏡頭互動與物理更新分離。支援五軸目標、暫停／單步／重設，以及原廠 SDK 排隊動作與讀回。</p><a class="inline-link" href="https://github.com/choulinc/dorna2-embodied-sim/pull/7" target="_blank" rel="noopener noreferrer">PR #7 詳情 ↗</a></article>
+            <article class="release-card"><div class="release-top"><span class="mini-label">PR #8 · 2026.10.30</span><span class="pill pill-green">MERGED</span></div><h3>修復 CPU／評估回歸<br>＋獨立 CUDA 12 驗收</h3><p>修正滿佇列讀回、USD 透明度／零重力、source distribution 內容、實驗結果覆寫與 episode cohort 偏差；新增 <code>cu126</code> 候選 profile、host probe 與分階段 acceptance。</p><a class="inline-link" href="https://github.com/choulinc/dorna2-embodied-sim/pull/8" target="_blank" rel="noopener noreferrer">PR #8 詳情 ↗</a></article>
+          </div>
+          <div class="delta-panel"><div><span class="mini-label">WHAT CHANGED</span><h3>原站最需要修正的 4 件事</h3></div><ol class="delta-list"><li><strong>H100 不再是「完全沒跑過」：</strong>已驗證部分 Newton 物理／遠端串流與 SDK 控制。</li><li><strong>H100 PPO 仍未驗證：</strong>單純 CUDA compute probe 不是完整 Isaac Lab / Newton 訓練成功。</li><li><strong>Viewer 已由歷史 Rerun 改為 Newton ViewerGL：</strong>Rerun 文件是舊部署紀錄，不是現行預設方案。</li><li><strong>CI／本地測試資料須更新：</strong>最新主分支 3 個 CI jobs 都成功，Mac 完整測試為 350 個 CPU/相關測試。</li></ol></div>
+        </section>
+
+        <section id="architecture" class="doc-section" data-title="系統架構" data-keywords="architecture packages folders layers source root experiments mujo">
+          <div class="section-head"><span class="section-num">03 / SYSTEM MAP</span><h2>系統架構</h2><p>重點是<strong>明確隔離 runtime</strong>，而不是將所有模擬與訓練塞到同一套 Python 環境。</p></div>
+          <div class="architecture-map"><article class="layer layer-blue"><div class="layer-kicker">01 · FOUNDATION</div><h3>MuJoCo CPU</h3><code>src/dorna2_mujoco/</code><p>模型載入、關節控制、Simulation、指令佇列、數值檢查。</p><div class="chips"><span>MuJoCo 3.4.0</span><span>Python 3.12</span><span>Headless</span></div></article><div class="layer-connect"><span>獨立核心</span><div>↔</div></div><article class="layer layer-purple"><div class="layer-kicker">02 · OPTIONAL</div><h3>CAD / USD / SDK</h3><code>cad.py · usd.py · official.py</code><p>本地 CAD 掛載、USD 匯出、官方 SDK helper 的離線模擬橋接。</p><div class="chips"><span>按需安裝</span><span>無硬體傳輸</span></div></article><div class="layer-connect"><span>獨立鎖檔</span><div>↔</div></div><article class="layer layer-green"><div class="layer-kicker">03 · EXPERIMENT</div><h3>GPU / RL</h3><code>experiments/isaaclab_newton/</code><p>Isaac Lab / Newton、MJWarp、RSL-RL、PPO、IK、benchmark、replay。</p><div class="chips"><span>RTX 已測</span><span>H100 待驗收</span></div></article></div>
+          <div class="remote-strip"><div class="remote-strip-icon">↗</div><div><strong>另外新增：Newton Remote（獨立部署）</strong><p><code>experiments/isaaclab_newton/native-streaming/</code>；Mac ViewerGL 與 H100 GPU 物理透過認證 SSH tunnel 傳遞姿態與命令，不依賴 GPU 訓練 lock。</p></div><a href="#remote" class="inline-link">查看實作 →</a></div>
+          <div class="split-block"><div><h3>核心資料流</h3><div class="flow-code">MJCF/XML <span>→</span> MjModel <span>→</span> MjData <span>→</span> Controller <span>→</span> mj_step <span>→</span> State/TCP</div></div><div><h3>不可混為一談</h3><p>在 H100 上執行 MuJoCo CPU 程式，不代表它自動變成 GPU 物理。GPU experiment 是另一套經過特別整合的 physics / learning stack。</p></div></div>
+        </section>
+
+        <section id="foundation" class="doc-section" data-title="核心模型與控制" data-keywords="model mjcf joint j0 j1 j2 j3 j4 tcp controller step PD force rad">
+          <div class="section-head"><span class="section-num">04 / FOUNDATION</span><h2>核心模型與控制</h2><p>先理解 5-DOF MJCF 的關節約定，再理解輸入控制目標後為什麼還需要物理時間推進。</p></div>
+          <div class="two-col"><article class="surface"><div class="mini-label">ROBOT MODEL</div><h3>五軸運動學</h3><div class="joint-table"><div><b>J0</b><span>Base yaw</span><code>−160°～180°</code></div><div><b>J1</b><span>Shoulder pitch</span><code>−90°～180°</code></div><div><b>J2</b><span>Elbow pitch</span><code>−142°～142°</code></div><div><b>J3</b><span>Wrist pitch</span><code>−135°～135°</code></div><div><b>J4</b><span>Tool roll</span><code>連續轉動</code></div></div><p class="muted small">J0 使用保守限位政策；實際機型版本仍需核對。TCP 預設和 flange 共點、沒有夾爪延伸。</p></article><article class="surface"><div class="mini-label">CONTROL LAW</div><h3>位置致動器不是瞬間移動</h3><div class="equation">τ ≈ clip[k<sub>p</sub>(q<sub>target</sub> − q) − k<sub>v</sub>q̇]</div><p><code>set_target()</code> 設定角度目標；position actuator 根據近似伺服模型產生力矩，<code>mj_step()</code> 才會更新系統動態。</p><div class="facts"><div><span>物理 dt</span><strong>0.002 s</strong></div><div><span>2000 steps</span><strong>4 s 模擬時間</strong></div><div><span>內部單位</span><strong>m · rad · s · kg</strong></div></div></article></div>
+          <div class="code-frame"><div class="code-top"><span><span class="dot"/> Python · headless minimal</span><button type="button" class="copy-code" data-copy="code-foundation">複製程式</button></div><pre><code id="code-foundation">import numpy as np
+from dorna2_mujoco.simulation import Simulation
+
+sim = Simulation()
+sim.controller.set_target(np.deg2rad([20, 35, -60, 25, 45]))
+sim.step(2000)
+print(sim.joint_positions)  # radians
+print(sim.tcp_position)     # metres, world/base frame</code></pre></div>
+          <p class="source-line">來源：<a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/model_spec.md" target="_blank" rel="noopener noreferrer">model_spec.md ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/models/dorna2.xml" target="_blank" rel="noopener noreferrer">models/dorna2.xml ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/simulation.py" target="_blank" rel="noopener noreferrer">simulation.py ↗</a></p>
+        </section>
+
+        <section id="cad-sdk" class="doc-section" data-title="CAD 與離線 SDK" data-keywords="CAD STEP mesh STL USD SDK offline jmove sleep vendor">
+          <div class="section-head"><span class="section-num">05 / EXTENSIONS</span><h2>CAD 與離線 SDK</h2><p>兩個擴充解決完全不同的問題：CAD 提供<strong>視覺外觀</strong>，SDK 提供<strong>官方指令介面的一致性</strong>。</p></div>
+          <div class="two-col"><div class="surface"><div class="mini-label">CAD PIPELINE</div><h3>STEP → 場景外觀</h3><div class="stepper"><div><span>01</span><strong>STEP + 註冊 profile</strong><small>來源 hash、六個組件、座標轉換</small></div><div><span>02</span><strong>Mesh / scene.xml</strong><small>只新增 visual mesh，維持 physics primitives</small></div><div><span>03</span><strong>本地場景部署</strong><small>scene + meshes 複製到 runtime，轉換工具不必跟著移動</small></div></div><div class="warning-inline">廠商 STEP 與產生的 mesh 不放入 Git 或公開 site；CI 以原創 CC0 test boxes 驗證。外觀更像實機 ≠ 動力學更準確。</div></div><div class="surface"><div class="mini-label">OFFLINE SDK BRIDGE</div><h3>官方 helper → MuJoCo</h3><div class="stepper"><div><span>01</span><strong>Vendor SDK 2.1.2</strong><small><code>jmove</code> / <code>sleep</code> / joints readback</small></div><div><span>02</span><strong>Commands queue</strong><small>五軸目標、速度／加速度／jerk、狀態</small></div><div><span>03</span><strong>Simulated motion</strong><small>SDK 邊界 degrees；物理核心 radians</small></div></div><div class="warning-inline">僅模擬 adapter；不會連接真實手臂。Cartesian、continuous blending、I/O 與硬體操作尚未支援。</div></div></div>
+          <div class="mini-table-wrap"><table><thead><tr><th>檔案</th><th>角色</th></tr></thead><tbody><tr><td><a class="file-path" href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/cad.py" target="_blank" rel="noopener noreferrer">src/dorna2_mujoco/cad.py ↗</a></td><td>STEP → 網格轉換與 registration</td></tr><tr><td><a class="file-path" href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/usd.py" target="_blank" rel="noopener noreferrer">src/dorna2_mujoco/usd.py ↗</a></td><td>USD articulation 與物理參數轉換</td></tr><tr><td><a class="file-path" href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/commands.py" target="_blank" rel="noopener noreferrer">src/dorna2_mujoco/commands.py ↗</a></td><td>軌跡佇列、狀態與 input validation</td></tr><tr><td><a class="file-path" href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/official.py" target="_blank" rel="noopener noreferrer">src/dorna2_mujoco/official.py ↗</a></td><td>原廠 SDK helper 的離線 adapter</td></tr></tbody></table></div>
+        </section>
+
+        <section id="remote" class="doc-section" data-title="Mac Newton Remote" data-keywords="native mac viewer viewerGL app H100 SSH stream SDK python controls pause step reset orbit">
+          <div class="section-head"><span class="section-num">06 / NATIVE REMOTE · NEW</span><h2>Mac Newton Remote</h2><p>這是從 10/9 快照後最重要的新能力：<strong>本地原版 Newton ViewerGL</strong> 與遠端 H100 physics 分工，而不是把遠端畫面編碼成影片。</p></div>
+          <div class="remote-diagram"><div class="device-block"><span class="device-icon">⌘</span><strong>Apple Silicon Mac</strong><small>Newton ViewerGL 1.6.1</small><ul><li>OpenGL + ImGui 本地繪圖</li><li>視角 orbit / pan / zoom</li><li>SDK Python console</li></ul></div><div class="connection-block"><span>SSH · AUTHENTICATED</span><div class="connection-line"><i>⇄</i></div><small>Pose stream → Mac<br>Commands → H100</small></div><div class="device-block device-server"><span class="device-icon">▤</span><strong>H100-20C VM</strong><small>Newton 1.6.1 + MJWarp</small><ul><li>物理步進與運動佇列</li><li>模擬狀態／指令 API</li><li>100-step 實際 smoke</li></ul></div></div>
+          <div class="three-col"><div class="surface compact"><span class="mini-label">VIEWER</span><h3>原生繪製</h3><p>150+ 幀真實遠端 body state 在 Mac 顯示；body-transform 套用誤差為 0（資料層 readback）。</p></div><div class="surface compact"><span class="mini-label">CONTROLS</span><h3>暫停與單步</h3><p><kbd>Space</kbd> 暫停；<kbd>.</kbd> 單步 0.002 s；Reset 重設；左鍵拖曳軌道，Shift＋拖曳平移。</p></div><div class="surface compact"><span class="mini-label">SECURITY</span><h3>認證通道</h3><p>透過 SSH 的 localhost forwarding 與 session token 控制；沒有對外新增公開服務。</p></div></div>
+          <div class="split-block split-top"><div><h3>SDK 控制範例</h3><p>Python 端沿用官方 <code>jmove</code>、<code>sleep</code>、關節讀回與腳本 helper；server 排隊執行，不必逐步送網路命令。</p></div><div><div class="info-mini"><span class="pill pill-amber">有限能力</span><p><strong>0 → 1 → 2</strong> = accepted → started → planned complete。completed 不是「實機軌跡零誤差」。</p></div></div></div>
+          <div class="code-frame"><div class="code-top"><span><span class="dot"/> Python · actual vendor SDK / simulation</span><button type="button" class="copy-code" data-copy="code-sdk">複製程式</button></div><pre><code id="code-sdk">from newton_dorna import connect_sim
+
+with connect_sim() as robot:
+    robot.resume()
+    robot.jmove(j0=10, j1=35, j2=-60, j3=25, j4=30,
+                rel=0, vel=30, accel=60, jerk=240,
+                cont=0, timeout=0)
+    robot.sleep(0.5)
+    print(robot.get_all_joint())</code></pre></div>
+          <div class="metric-ribbon"><div><span>遠端資料</span><strong>150+ frames</strong><small>已到 Mac Viewer</small></div><div><span>提交往返</span><strong>52.2 ms</strong><small>2 次 SDK 動作中位數</small></div><div><span>實際物理進度</span><strong>0.362×</strong><small>3.034 s / 8.378 s wall</small></div><div><span>模擬追蹤</span><strong>0.569°</strong><small>該次 motion 最大關節誤差</small></div></div>
+          <div class="intro-note caution"><div class="note-icon">!</div><p><strong>不要解讀成實時控制：</strong>上述是 2026/10/28 特定 H100 vGPU／Mac M1 環境的實際紀錄，非通用延遲保證，也不是實體手臂控制精度。CUDA Graph 加速試驗在該 vGPU 上失敗，並未部署到正式 solver。</p></div>
+          <p class="source-line">來源：<a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/README.md" target="_blank" rel="noopener noreferrer">Native Remote README ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/VALIDATION.md" target="_blank" rel="noopener noreferrer">VALIDATION ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/SDK-CONTRACT.md" target="_blank" rel="noopener noreferrer">SDK-CONTRACT ↗</a></p>
+        </section>
+
+        <section id="gpu" class="doc-section" data-title="GPU / PPO 實驗" data-keywords="GPU RTX PPO Dorna reach ik UR10 learning training evaluation world Newton warp">
+          <div class="section-head"><span class="section-num">07 / GPU EXPERIMENT</span><h2>GPU / PPO 實驗</h2><p>實際測量在 <strong>RTX PRO 4000 Blackwell</strong> 上完成；使用 Isaac Lab、Newton/MJWarp、RSL-RL 的獨立 runtime。<strong>不能把這些結果直接當成 H100 數字。</strong></p></div>
+          <div class="result-header"><div><span class="mini-label">DORNA2 · TCP POSITION REACH</span><h3>1,000 episodes 的評估</h3></div><span class="pill">SEED 1009 · HELD OUT</span></div>
+          <div class="result-bars"><div class="result-row"><div class="result-name"><strong>位置 IK Controller</strong><small>非學習式方法</small></div><div class="bar-track"><div class="bar-fill ik" style="width:100%"></div></div><strong>100.0%</strong></div><div class="result-row"><div class="result-name"><strong>Dorna PPO</strong><small>單一訓練 seed</small></div><div class="bar-track"><div class="bar-fill ppo" style="width:47%"></div></div><strong>47.0%</strong></div><div class="result-row"><div class="result-name"><strong>Zero-action baseline</strong><small>不主動控制</small></div><div class="bar-track"><div class="bar-fill zero" style="width:0.4%;min-width:3px"></div></div><strong>0.4%</strong></div></div>
+          <div class="two-col"><div class="surface compact"><div class="mini-label">TASK DEFINITION</div><h3>Dorna2-Reach-Position</h3><div class="facts facts-two"><div><span>成功門檻</span><strong>TCP &lt; 2 cm</strong></div><div><span>持續時間</span><strong>0.2 s</strong></div><div><span>Episode</span><strong>6 s</strong></div><div><span>Action rate</span><strong>50 Hz</strong></div></div><p class="small muted">dt = 0.002 s；每 10 個 physics steps 更新一次 action。只限制 TCP 位置，不評估任意末端姿態。</p></div><div class="surface compact"><div class="mini-label">UR10 REPRODUCTION</div><h3>多 seed 結果差異很大</h3><div class="ur10-rates"><div><span>Seed 0</span><div><i style="width:8.6%"></i></div><b>8.6%</b></div><div><span>Seed 1</span><div><i style="width:48.4%"></i></div><b>48.4%</b></div><div><span>Seed 2</span><div><i style="width:27%"></i></div><b>27.0%</b></div></div><p class="small muted">各 1,000 episodes；PPO 訓練 128 worlds × 1,000 iterations。可證明流程可執行，不能證明穩定收斂。</p></div></div>
+          <div class="info-mini full"><span class="pill pill-amber">EVIDENCE BOUNDARY</span><p>IK 100% 是<strong>位置控制器</strong>在指定 reachable 目標上的成功率，不是 VLA／PPO 的表現；Dorna PPO 47% 僅一個訓練 seed，還缺多 seed 與完整 sim-to-real 驗證。物理 throughput 與 PPO end-to-end training throughput 也必須分開計算。</p></div>
+          <p class="source-line">來源：<a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/gpu_validation.md" target="_blank" rel="noopener noreferrer">docs/gpu_validation.md ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/README.md" target="_blank" rel="noopener noreferrer">GPU experiment README ↗</a></p>
+        </section>
+
+        <section id="h100" class="doc-section" data-title="H100 與 CUDA 12" data-keywords="H100 nvidia driver cu126 CUDA12 13 compute probe physics acceptance unresolved">
+          <div class="section-head"><span class="section-num">08 / DEPLOYMENT · NEW</span><h2>H100 與 CUDA 12</h2><p>將不同層級的驗證分開：<strong>硬體可算 CUDA</strong>、<strong>Newton 實際物理可跑</strong>、<strong>完整 PPO stack 可重現</strong>，是三個獨立問題。</p></div>
+          <div class="evidence-grid"><div class="evidence"><span class="ev-icon yes">✓</span><h3>Host CUDA Compute</h3><p>H100-20C 的既有 Torch 2.9.1+cu128、Warp 1.18.0+cu12 執行算術、矩陣乘法、Warp kernel 與 interoperability 測試。</p><span class="ev-label yes-label">已有主機測試紀錄</span></div><div class="evidence"><span class="ev-icon yes">✓</span><h3>Newton 遠端模擬</h3><p>H100 實際 100-step smoke、Mac viewer 150+ frames、SDK 動作／查詢通過；非實時物理速度。</p><span class="ev-label yes-label">特定 VM / native runtime 已測</span></div><div class="evidence"><span class="ev-icon pending">!</span><h3>CUDA 12 PPO Stack</h3><p>獨立 <code>cu126</code> profile 與分階段 acceptance 已有程式碼，但尚無完整 H100 lock resolution / GPU 訓練／qualification 成功結果。</p><span class="ev-label pending-label">待驗證</span></div></div>
+          <div class="two-col"><article class="surface compact"><span class="mini-label">CURRENT / ORIGINAL</span><h3>原 RTX CUDA 13 實驗</h3><div class="version-stack"><span>Torch</span><code>2.12.0+cu130</code><span>Warp</span><code>1.17.0</code><span>Newton</span><code>1.6.1</code><span>MuJoCo/MJWarp</span><code>3.12.0</code></div><p class="small muted">原始 GPU lock 保留，已在 RTX 工作站驗證；不是 H100 最新 driver 直接可用的保證。</p></article><article class="surface compact"><span class="mini-label">CANDIDATE / SEPARATE</span><h3>cu126 候選路徑</h3><div class="version-stack"><span>Torch</span><code>2.12.0+cu126</code><span>Warp</span><code>1.17.0</code><span>Newton</span><code>1.6.1</code><span>Status</span><code>unresolved / unqualified</code></div><p class="small muted">依獨立 profile 安裝，不修改原 lock；候選方案不等於已完成 H100 訓練。</p></article></div>
+          <div class="code-frame"><div class="code-top"><span><span class="dot"/> Bash · cu126 preflight (不建立 GPU 環境)</span><button type="button" class="copy-code" data-copy="code-cu126">複製指令</button></div><pre><code id="code-cu126">python3 experiments/isaaclab_newton/scripts/accept_cu12.py \
+  --check --output /tmp/dorna2-cu126-preflight \
+  --bootstrap-python /path/to/existing/python-with-pip</code></pre></div>
+          <p class="muted">完整 acceptance 的階段依序是依賴解析、版本／import、CUDA 診斷、Cartpole smoke、UR10 smoke、checkpoint reload／評估、Dorna primitive MJCF qualification。<strong>本頁不宣稱這些完整階段已在 H100 通過。</strong></p>
+          <p class="source-line">來源：<a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/deployment.md" target="_blank" rel="noopener noreferrer">docs/deployment.md ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/scripts/accept_cu12.py" target="_blank" rel="noopener noreferrer">accept_cu12.py ↗</a></p>
+        </section>
+
+        <section id="validation" class="doc-section" data-title="驗證與 CI" data-keywords="CI tests github actions pass skipped zero 350 native cad usd validate">
+          <div class="section-head"><span class="section-num">09 / QUALITY GATES</span><h2>驗證與 CI</h2><p>2026/10/30 最新主分支 <code>99af6e2</code> 的 GitHub Actions run <a href="https://github.com/choulinc/dorna2-embodied-sim/actions/runs/41021319293" target="_blank" rel="noopener noreferrer">41021319293 ↗</a>，<strong>三個工作均成功</strong>。</p></div>
+          <div class="ci-grid"><article><div class="ci-status"><span class="pulse"></span> PASS</div><h3>validate</h3><p>Ruff、CPU 測試、GPU experiment CPU tests、hooks、安裝後 wheel、解壓 sdist 註冊、CPU Docker smoke。</p></article><article><div class="ci-status"><span class="pulse"></span> PASS</div><h3>official-sdk</h3><p>固定的原廠 SDK、離線動作與 command tests、native remote transport / controller / SDK tests。</p></article><article><div class="ci-status"><span class="pulse"></span> PASS</div><h3>cad-usd</h3><p>額外安裝 CAD / USD 套件，用原創 STEP fixtures 測試轉換與 USD schema。</p></article></div>
+          <div class="two-col"><div class="surface compact"><span class="mini-label">LOCAL REVIEW · macOS ARM64</span><h3>350 passed</h3><p>Python 3.12.16、完整 CPU/core/SDK/CAD/USD/artifact 測試，<strong>0 skipped</strong>；另有 36 個 native transport/backend/actual-SDK tests、8 個實際 Newton 相機回歸測試。</p></div><div class="surface compact"><span class="mini-label">SEPARATE EXECUTION</span><h3>不同測試範圍不要相加</h3><p>本地測試與 GitHub CI 有重疊，H100 實機環境測試也不在這三個 Ubuntu CI jobs 裡。CI green ≠ H100 PPO、攝影機或實體機器人合格。</p></div></div>
+          <h3 class="subheading">PR #8 修掉了什麼？</h3>
+          <div class="mini-table-wrap"><table><thead><tr><th>範圍</th><th>修正後的行為</th></tr></thead><tbody><tr><td>Commands</td><td>即使 motion queue 滿載，joint readback 仍能運作</td></tr><tr><td>USD export</td><td>保留零重力向量與 geometry alpha</td></tr><tr><td>Packaging</td><td>sdist 包含 CAD registration profiles 與 Python pin</td></tr><tr><td>Artifacts</td><td>CPU trace 輸出不覆蓋已有 archive / metadata</td></tr><tr><td>Evaluation</td><td>每個環境配置固定 episode quota，避免快完成的環境偏置整體統計</td></tr></tbody></table></div>
+          <p class="source-line">來源：<a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/.github/workflows/ci.yml" target="_blank" rel="noopener noreferrer">ci.yml ↗</a> · <a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/validation.md" target="_blank" rel="noopener noreferrer">validation.md ↗</a></p>
+        </section>
+
+        <section id="timeline" class="doc-section" data-title="Git 開發歷程" data-keywords="history commit timeline change log 2026 october PR development">
+          <div class="section-head"><span class="section-num">10 / HISTORY</span><h2>Git 開發歷程</h2><p>只記錄可由 commit／PR 或帶日期驗證紀錄支持的里程碑；單次原始 commit 內部的檔案撰寫先後無法從 Git 還原。</p></div>
+          <div class="timeline"><div class="tl"><time>10 / 02</time><span class="tl-dot"></span><div><h3>Foundation 建立</h3><p>MJCF、模擬、控制、診斷、鎖定依賴與初始 CI。</p></div></div><div class="tl"><time>10 / 08</time><span class="tl-dot"></span><div><h3>輸入驗證與 CAD / USD</h3><p>PR #4 修 CI、PR #5 補驗證；原創測試資產、USD schema／部署流程逐步完成。</p></div></div><div class="tl"><time>10 / 09</time><span class="tl-dot"></span><div><h3>PR #6：GPU / SDK / CAD 擴充</h3><p>舊版網站的最後快照 <code>b818c63</code>；包含早期 RTX GPU/RL 工作與 offline SDK。</p><a href="https://github.com/choulinc/dorna2-embodied-sim/pull/6" target="_blank" rel="noopener noreferrer">PR #6 ↗</a></div></div><div class="tl"><time>10 / 23–24</time><span class="tl-dot"></span><div><h3>H100 compute probe 與 cu126 候選</h3><p>既有 Torch/Warp 環境的 H100 compute 通過；建立但尚未完成全套 acceptance 的 CUDA 12 候選路徑。</p></div></div><div class="tl"><time>10 / 28</time><span class="tl-dot"></span><div><h3>Mac ↔ H100 原生 Viewer 實際部署</h3><p>Newton ViewerGL 接收串流、SSH SDK 控制、相機與 motion 的實際環境測試紀錄。</p></div></div><div class="tl tl-last"><time>10 / 30</time><span class="tl-dot"></span><div><h3>PR #7 與 #8 合併到 main</h3><p>Native Viewer/SDK 進主分支；修正 regression、加入 cu126 acceptance；最新 CI 三個 jobs 通過。</p><a href="https://github.com/choulinc/dorna2-embodied-sim/commit/99af6e2113cfdf4ef3fc04e36c153db29ac50243" target="_blank" rel="noopener noreferrer">99af6e2 ↗</a></div></div></div>
+        </section>
+
+        <section id="learning" class="doc-section" data-title="閱讀與實作路線" data-keywords="learn guide reading steps quickstart tutorial">
+          <div class="section-head"><span class="section-num">11 / READING ORDER</span><h2>建議閱讀與實作路線</h2><p>如果目標是快速理解整個 repo，推薦依依賴關係往下讀，而不是從 GPU 訓練開始。</p></div>
+          <div class="learning-grid"><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/foundation_spec.md" target="_blank" rel="noopener noreferrer"><span>01</span><h3>先看要求與邊界</h3><p>foundation_spec.md</p><b>↗</b></a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/model_spec.md" target="_blank" rel="noopener noreferrer"><span>02</span><h3>理解五軸模型</h3><p>model_spec.md → dorna2.xml</p><b>↗</b></a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/simulation.py" target="_blank" rel="noopener noreferrer"><span>03</span><h3>追一次 set_target → step</h3><p>model.py / control.py / simulation.py</p><b>↗</b></a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/src/dorna2_mujoco/commands.py" target="_blank" rel="noopener noreferrer"><span>04</span><h3>理解 SDK 指令佇列</h3><p>commands.py / official.py</p><b>↗</b></a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/README.md" target="_blank" rel="noopener noreferrer"><span>05</span><h3>理解 Mac 與 H100 分工</h3><p>native-streaming README + contract</p><b>↗</b></a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/README.md" target="_blank" rel="noopener noreferrer"><span>06</span><h3>最後讀 GPU／PPO 與驗證</h3><p>GPU README + gpu_validation.md</p><b>↗</b></a></div>
+          <div class="code-frame"><div class="code-top"><span><span class="dot"/> Bash · 本地最小執行</span><button type="button" class="copy-code" data-copy="code-quickstart">複製指令</button></div><pre><code id="code-quickstart">uv sync --locked --group dev
+MUJOCO_GL=disable uv run dorna2-headless \
+  --steps 2000 --target-deg 20 35 -60 25 45
+uv run dorna2-diagnose</code></pre></div>
+        </section>
+
+        <section id="references" class="doc-section" data-title="檔案索引與來源" data-keywords="source references github docs validation sha provenance links">
+          <div class="section-head"><span class="section-num">12 / SOURCE OF TRUTH</span><h2>檔案索引與來源</h2><p>每一個連結都固定到 <code>99af6e2113cf</code> 快照，避免原站用舊 commit 卻描述新實作。Repository 為 private，閱讀 GitHub 連結需要具備存取權限。</p></div>
+          <div class="reference-grid"><div class="ref-group"><h3>核心模型與套件</h3><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/README.md" target="_blank" rel="noopener noreferrer">README.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/model_spec.md" target="_blank" rel="noopener noreferrer">docs/model_spec.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/models/dorna2.xml" target="_blank" rel="noopener noreferrer">models/dorna2.xml ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/official_sdk.md" target="_blank" rel="noopener noreferrer">docs/official_sdk.md ↗</a></div><div class="ref-group"><h3>Remote / H100</h3><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/README.md" target="_blank" rel="noopener noreferrer">native-streaming/README.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/native-streaming/VALIDATION.md" target="_blank" rel="noopener noreferrer">native-streaming/VALIDATION.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/deployment.md" target="_blank" rel="noopener noreferrer">docs/deployment.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/scripts/accept_cu12.py" target="_blank" rel="noopener noreferrer">scripts/accept_cu12.py ↗</a></div><div class="ref-group"><h3>GPU 與驗證</h3><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/experiments/isaaclab_newton/README.md" target="_blank" rel="noopener noreferrer">GPU experiment README ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/gpu_validation.md" target="_blank" rel="noopener noreferrer">docs/gpu_validation.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/blob/99af6e2113cfdf4ef3fc04e36c153db29ac50243/docs/validation.md" target="_blank" rel="noopener noreferrer">docs/validation.md ↗</a><a href="https://github.com/choulinc/dorna2-embodied-sim/actions/runs/41021319293" target="_blank" rel="noopener noreferrer">Latest successful CI run ↗</a></div></div>
+          <footer class="site-footer"><div><strong>DORNA2</strong><span>Repository Field Guide · Rev. 2 · 2026.10.30</span></div><div>Static documentation snapshot · <a href="#top">回到頂端 ↑</a></div></footer>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="搜尋導讀" aria-hidden="true">
+    <div class="search-panel"><div class="search-top"><span>⌕</span><input type="search" id="site-search" autocomplete="off" placeholder="搜尋主題、檔案、功能或關鍵字…" aria-label="搜尋導讀章節"><button type="button" id="search-close" aria-label="關閉搜尋">ESC</button></div><div class="search-hint">搜尋本頁 12 個章節 · 按 ↑↓ 選取，Enter 跳轉</div><div class="search-results" id="search-results"></div></div>
+  </div>
+<script>(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const all = s => [...document.querySelectorAll(s)];
+  const sidebar = $('#sidebar');
+  const overlay = $('#sidebar-overlay');
+  const menu = $('#menu-toggle');
+  const navLinks = all('.side-nav a');
+  const sections = all('main .doc-section');
+  const progress = $('#read-progress');
+
+  const closeMenu = () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    menu.setAttribute('aria-expanded', 'false');
+  };
+  menu.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    overlay.classList.toggle('open', open);
+    menu.setAttribute('aria-expanded', String(open));
+  });
+  overlay.addEventListener('click', closeMenu);
+  navLinks.forEach(link => link.addEventListener('click', closeMenu));
+
+  const updateProgress = () => {
+    const body = document.documentElement;
+    const available = body.scrollHeight - window.innerHeight;
+    progress.style.width = `${available > 0 ? Math.min(100, window.scrollY / available * 100) : 0}%`;
+  };
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (!visible.length) return;
+      const id = visible[0].target.id;
+      navLinks.forEach(a => {
+        const active = a.getAttribute('href') === `#${id}`;
+        a.classList.toggle('active', active);
+        if (active) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }, { rootMargin: '-20% 0px -67% 0px', threshold: 0 });
+    sections.forEach(section => observer.observe(section));
+  }
+
+  const themeKey = 'dorna2-field-guide-theme';
+  const saved = localStorage.getItem(themeKey);
+  if (saved === 'light') document.documentElement.dataset.theme = 'light';
+  $('#theme-button').addEventListener('click', () => {
+    const light = document.documentElement.dataset.theme !== 'light';
+    document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    localStorage.setItem(themeKey, light ? 'light' : 'dark');
+  });
+
+  all('[data-copy]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const node = document.getElementById(button.dataset.copy);
+      if (!node) return;
+      const value = node.textContent;
+      const original = button.textContent;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          const area = document.createElement('textarea');
+          area.value = value;
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.append(area);
+          area.select();
+          if (!document.execCommand('copy')) throw new Error('copy failed');
+          area.remove();
+        }
+        button.textContent = '已複製 ✓';
+      } catch (err) {
+        button.textContent = '請手動複製';
+      }
+      window.setTimeout(() => { button.textContent = original; }, 1600);
+    });
+  });
+
+  const modal = $('#search-overlay');
+  const input = $('#site-search');
+  const results = $('#search-results');
+  let activeIndex = 0;
+  const docs = sections.map((section, index) => ({
+    title: section.dataset.title || '',
+    keywords: section.dataset.keywords || '',
+    text: section.textContent.slice(0, 1800).toLowerCase(),
+    id: section.id,
+    index
+  }));
+  const normalize = value => value.toLocaleLowerCase('zh-Hant').trim();
+  function matches() {
+    const q = normalize(input.value);
+    if (!q) return docs;
+    const tokens = q.split(/\s+/);
+    return docs.filter(doc => {
+      const string = `${doc.title} ${doc.keywords} ${doc.text}`.toLowerCase();
+      return tokens.every(token => string.includes(token));
+    });
+  }
+  function renderResults() {
+    const found = matches();
+    activeIndex = Math.min(activeIndex, Math.max(0, found.length - 1));
+    results.replaceChildren();
+    if (!found.length) {
+      const notice = document.createElement('div');
+      notice.className = 'no-results';
+      notice.textContent = '找不到符合的章節，試試「H100」、「SDK」、「CI」或「PPO」。';
+      results.append(notice);
+      return;
+    }
+    found.forEach((doc, i) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      if (i === activeIndex) button.classList.add('selected');
+      const n = document.createElement('span');
+      n.textContent = String(doc.index + 1).padStart(2, '0');
+      const title = document.createElement('strong');
+      title.textContent = doc.title;
+      const hint = document.createElement('small');
+      hint.textContent = '跳轉 ↗';
+      button.append(n, title, hint);
+      button.addEventListener('click', () => goTo(doc.id));
+      results.append(button);
+    });
+  }
+  function goTo(id) {
+    closeSearch();
+    const target = document.getElementById(id);
+    if (target) target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    history.replaceState(null, '', `#${id}`);
+  }
+  function openSearch() {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    activeIndex = 0;
+    input.value = '';
+    renderResults();
+    window.requestAnimationFrame(() => input.focus());
+  }
+  function closeSearch() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    $('#search-button').focus({preventScroll:true});
+  }
+  $('#search-button').addEventListener('click', openSearch);
+  $('#search-close').addEventListener('click', closeSearch);
+  modal.addEventListener('mousedown', e => { if (e.target === modal) closeSearch(); });
+  input.addEventListener('input', () => { activeIndex = 0; renderResults(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !modal.classList.contains('open') && !/input|textarea/i.test(document.activeElement.tagName)) {
+      e.preventDefault(); openSearch();
+    }
+    if (e.key === 'Escape') { if (modal.classList.contains('open')) closeSearch(); else closeMenu(); }
+    if (!modal.classList.contains('open')) return;
+    const found = matches();
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(found.length - 1, activeIndex + 1); renderResults(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(0, activeIndex - 1); renderResults(); }
+    if (e.key === 'Enter' && found[activeIndex]) { e.preventDefault(); goTo(found[activeIndex].id); }
+  });
+})();
+</script>
+</body>
+</html>
