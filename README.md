@@ -1,4 +1,6 @@
-# 辦點事 · To-Do List
+# This is for the course
+
+## 辦點事 · To-Do List
 
 [線上使用](https://choulinc.github.io/SWP03/) · 純 HTML、CSS、JavaScript，無需帳號或後端。待辦資料存在目前瀏覽器的 LocalStorage。
 

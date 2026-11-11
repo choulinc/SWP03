@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>借一下 · YouBike 即時看板</title>
+<meta name="description" content="串接臺北市政府資料開放平台 YouBike2.0 即時資料的資訊看板，顯示各站可借車輛與可還空位。" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="site-header">
+    <div class="brand">
+      <img src="favicon.svg" alt="" class="brand-mark" />
+      <span>借一下<span class="brand-period">．</span>YouBike 即時看板</span>
+    </div>
+    <button id="theme-toggle" class="icon-btn" type="button" aria-pressed="false" title="切換深色模式">
+      <span aria-hidden="true">🌙</span>
+      <span class="sr-only">切換深色模式</span>
+    </button>
+  </header>
+
+  <section class="status-bar" aria-live="polite">
+    <div id="status-line" class="status-line status-loading">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="status-text">正在連線臺北市資料開放平台…</span>
+    </div>
+    <div class="status-actions">
+      <span id="refresh-countdown" class="countdown"></span>
+      <button id="refresh-btn" class="btn-secondary" type="button">立即重新整理</button>
+    </div>
+  </section>
+
+  <section id="error-banner" class="error-banner" hidden>
+    <p>
+      <strong>資料暫時無法取得。</strong>
+      <span id="error-detail">可能是來源伺服器忙碌或網路不穩，這不代表站點真的沒有資料。</span>
+    </p>
+    <button id="retry-btn" class="btn-primary" type="button">重試</button>
+  </section>
+
+  <section class="summary-grid" id="summary-grid" aria-label="全市總覽">
+    <div class="summary-card">
+      <span class="summary-label">納入站點</span>
+      <span class="summary-value" id="stat-stations">—</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">目前營運中</span>
+      <span class="summary-value" id="stat-active">—</span>
+    </div>
+    <div class="summary-card accent-bike">
+      <span class="summary-label">可借車輛總數</span>
+      <span class="summary-value" id="stat-bikes">—</span>
+    </div>
+    <div class="summary-card accent-dock">
+      <span class="summary-label">可還空位總數</span>
+      <span class="summary-value" id="stat-docks">—</span>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="篩選與排序">
+    <div class="field search-field">
+      <label for="search-input" class="sr-only">搜尋站名或地址</label>
+      <input id="search-input" type="search" placeholder="搜尋站名或地址，例如「公館」「復興南路」" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="district-select">行政區</label>
+      <select id="district-select">
+        <option value="">全部行政區</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="sort-select">排序</label>
+      <select id="sort-select">
+        <option value="bikes-desc">可借車輛由多到少</option>
+        <option value="docks-desc">可還空位由多到少</option>
+        <option value="bikes-asc">可借車輛由少到多（快沒車）</option>
+        <option value="name">站名筆畫</option>
+      </select>
+    </div>
+    <div class="field checkbox-field">
+      <label>
+        <input id="hide-offline" type="checkbox" />
+        隱藏暫停營運站點
+      </label>
+    </div>
+  </section>
+
+  <p id="result-count" class="result-count"></p>
+
+  <main>
+    <div id="skeleton-grid" class="station-grid" aria-hidden="true"></div>
+    <div id="station-grid" class="station-grid" hidden></div>
+    <p id="empty-message" class="empty-message" hidden>找不到符合條件的站點，試試看調整篩選條件。</p>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      資料來源：<a href="https://data.taipei/dataset/detail?id=c6bc8aed-557d-41d5-bfb1-8da24f78f2fb" target="_blank" rel="noopener noreferrer">臺北市政府資料開放平台 － YouBike2.0 臺北市公共自行車即時資訊</a>，
+      依<a href="https://data.taipei/datatermsofuse" target="_blank" rel="noopener noreferrer">政府資料開放授權條款</a>釋出。
+      API 約每分鐘更新一次，頁面每 60 秒自動重新整理；每張卡片上的時間為該站資料的實際回報時間。
+    </p>
+    <p class="disclaimer">本頁為課堂練習作品，與臺北市政府或 YouBike 營運單位無關，資料正確性請以官方 App／網站為準。</p>
+  </footer>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
